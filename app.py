@@ -140,8 +140,14 @@ def approved_required(f):
 # Routes
 @app.route('/')
 def home():
-    featured_stories = Story.query.filter_by(is_published=True, is_featured=True).limit(3).all()
-    upcoming_events = Event.query.filter(Event.date > datetime.utcnow(), Event.is_active == True).limit(3).all()
+    try:
+        featured_stories = Story.query.filter_by(is_published=True, is_featured=True).limit(3).all()
+        upcoming_events = Event.query.filter(Event.date > datetime.utcnow(), Event.is_active == True).limit(3).all()
+    except Exception as e:
+        # If database tables don't exist yet, use empty lists
+        featured_stories = []
+        upcoming_events = []
+    
     return render_template('home.html', stories=featured_stories, events=upcoming_events)
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -269,9 +275,14 @@ def donate():
 
 @app.route('/jobs')
 def jobs():
-    page = request.args.get('page', 1, type=int)
-    jobs = Job.query.filter_by(is_active=True).order_by(Job.created_at.desc()).paginate(
-        page=page, per_page=10, error_out=False)
+    try:
+        page = request.args.get('page', 1, type=int)
+        jobs = Job.query.filter_by(is_active=True).order_by(Job.created_at.desc()).paginate(
+            page=page, per_page=10, error_out=False)
+    except Exception as e:
+        # If database tables don't exist yet, use empty pagination
+        jobs = type('obj', (object,), {'items': [], 'has_prev': False, 'has_next': False, 'prev_num': None, 'next_num': None, 'page': 1, 'pages': 0, 'total': 0})()
+    
     return render_template('jobs.html', jobs=jobs)
 
 @app.route('/post-job', methods=['GET', 'POST'])
@@ -334,8 +345,14 @@ def directory():
 
 @app.route('/events')
 def events():
-    upcoming = Event.query.filter(Event.date > datetime.utcnow(), Event.is_active == True).all()
-    past = Event.query.filter(Event.date <= datetime.utcnow()).all()
+    try:
+        upcoming = Event.query.filter(Event.date > datetime.utcnow(), Event.is_active == True).all()
+        past = Event.query.filter(Event.date <= datetime.utcnow()).all()
+    except Exception as e:
+        # If database tables don't exist yet, use empty lists
+        upcoming = []
+        past = []
+    
     return render_template('events.html', upcoming_events=upcoming, past_events=past)
 
 @app.route('/register-event/<int:event_id>')
@@ -358,7 +375,12 @@ def register_event(event_id):
 
 @app.route('/stories')
 def stories():
-    published_stories = Story.query.filter_by(is_published=True).order_by(Story.created_at.desc()).all()
+    try:
+        published_stories = Story.query.filter_by(is_published=True).order_by(Story.created_at.desc()).all()
+    except Exception as e:
+        # If database tables don't exist yet, use empty list
+        published_stories = []
+    
     return render_template('stories.html', stories=published_stories)
 
 @app.route('/submit-story', methods=['GET', 'POST'])
