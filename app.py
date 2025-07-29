@@ -116,7 +116,10 @@ class Story(db.Model):
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    try:
+        return User.query.get(int(user_id))
+    except Exception as e:
+        return None
 
 # Decorators
 def admin_required(f):
@@ -153,54 +156,60 @@ def home():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
-        first_name = request.form['first_name']
-        last_name = request.form['last_name']
-        graduation_year = request.form['graduation_year']
-        degree = request.form['degree']
-        department = request.form['department']
-        
-        if User.query.filter_by(email=email).first():
-            flash('Email already registered.', 'error')
-            return redirect(url_for('register'))
-        
-        user = User(
-            email=email,
-            password_hash=generate_password_hash(password),
-            first_name=first_name,
-            last_name=last_name,
-            graduation_year=int(graduation_year),
-            degree=degree,
-            department=department
-        )
-        
-        db.session.add(user)
-        db.session.commit()
-        
-        flash('Registration successful! Your account is pending approval.', 'success')
-        return redirect(url_for('login'))
+        try:
+            email = request.form['email']
+            password = request.form['password']
+            first_name = request.form['first_name']
+            last_name = request.form['last_name']
+            graduation_year = request.form['graduation_year']
+            degree = request.form['degree']
+            department = request.form['department']
+            
+            if User.query.filter_by(email=email).first():
+                flash('Email already registered.', 'error')
+                return redirect(url_for('register'))
+            
+            user = User(
+                email=email,
+                password_hash=generate_password_hash(password),
+                first_name=first_name,
+                last_name=last_name,
+                graduation_year=int(graduation_year),
+                degree=degree,
+                department=department
+            )
+            
+            db.session.add(user)
+            db.session.commit()
+            
+            flash('Registration successful! Your account is pending approval.', 'success')
+            return redirect(url_for('login'))
+        except Exception as e:
+            flash('Database not initialized. Please contact administrator.', 'error')
     
     return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
-        
-        user = User.query.filter_by(email=email).first()
-        
-        if user and check_password_hash(user.password_hash, password):
-            login_user(user)
-            if user.role == 'admin':
-                return redirect(url_for('admin_dashboard'))
-            elif user.is_approved:
-                return redirect(url_for('alumni_dashboard'))
+        try:
+            email = request.form['email']
+            password = request.form['password']
+            
+            user = User.query.filter_by(email=email).first()
+            
+            if user and check_password_hash(user.password_hash, password):
+                login_user(user)
+                if user.role == 'admin':
+                    return redirect(url_for('admin_dashboard'))
+                elif user.is_approved:
+                    return redirect(url_for('alumni_dashboard'))
+                else:
+                    return redirect(url_for('pending_approval'))
             else:
-                return redirect(url_for('pending_approval'))
-        else:
-            flash('Invalid email or password.', 'error')
+                flash('Invalid email or password.', 'error')
+        except Exception as e:
+            flash('Database not initialized. Please contact administrator.', 'error')
     
     return render_template('login.html')
 
@@ -221,9 +230,16 @@ def pending_approval():
 @login_required
 @approved_required
 def alumni_dashboard():
-    user_donations = Donation.query.filter_by(user_id=current_user.id).count()
-    user_jobs = Job.query.filter_by(user_id=current_user.id).count()
-    upcoming_events = Event.query.filter(Event.date > datetime.utcnow()).limit(5).all()
+    try:
+        user_donations = Donation.query.filter_by(user_id=current_user.id).count()
+        user_jobs = Job.query.filter_by(user_id=current_user.id).count()
+        upcoming_events = Event.query.filter(Event.date > datetime.utcnow()).limit(5).all()
+    except Exception as e:
+        # If database tables don't exist yet, use default values
+        user_donations = 0
+        user_jobs = 0
+        upcoming_events = []
+    
     return render_template('alumni_dashboard.html', 
                          donations_count=user_donations,
                          jobs_count=user_jobs,
