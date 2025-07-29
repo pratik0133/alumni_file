@@ -34,10 +34,6 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
-# Initialize database tables
-with app.app_context():
-    db.create_all()
-
 # Database Models
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -471,6 +467,33 @@ def feature_story(story_id):
     flash(f'Story {status} successfully!', 'success')
     return redirect(url_for('manage_stories'))
 
+# Database initialization route (for production setup)
+@app.route('/init-db')
+def initialize_database():
+    """Initialize database tables and create admin user"""
+    try:
+        with app.app_context():
+            db.create_all()
+            
+            # Create admin user if not exists
+            admin = User.query.filter_by(email='pratik@gmail.com').first()
+            if not admin:
+                admin = User(
+                    email='pratik@gmail.com',
+                    password_hash=generate_password_hash('admin123'),
+                    role='admin',
+                    is_approved=True,
+                    first_name='Admin',
+                    last_name='User'
+                )
+                db.session.add(admin)
+                db.session.commit()
+                return jsonify({'message': 'Database initialized successfully! Admin user created.'})
+            else:
+                return jsonify({'message': 'Database already initialized. Admin user exists.'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 # API Routes for analytics
 @app.route('/api/donation-stats')
 @login_required
@@ -483,7 +506,8 @@ def donation_stats():
     
     return jsonify([{'month': d.month, 'total': float(d.total)} for d in monthly_donations])
 
-if __name__ == '__main__':
+def init_db():
+    """Initialize database and create admin user"""
     with app.app_context():
         db.create_all()
         
@@ -500,7 +524,10 @@ if __name__ == '__main__':
             )
             db.session.add(admin)
             db.session.commit()
-    
+            print("Admin user created successfully!")
+
+if __name__ == '__main__':
+    init_db()
     # Only run in debug mode locally
     if os.environ.get('FLASK_ENV') != 'production':
         app.run(debug=True, port=1001)
