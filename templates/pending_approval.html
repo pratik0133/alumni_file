@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Pending Approval - Alumni Connect{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-clock fa-3x text-warning mb-3"></i>
+                    <h3>Account Pending Approval</h3>
+                    <p class="text-muted">
+                        Thank you for registering! Your account is currently under review by our administrators. 
+                        You will receive an email notification once your account is approved.
+                    </p>
+                    <p>
+                        <strong>What happens next?</strong><br>
+                        Our team will verify your alumni status and approve your account within 1-2 business days.
+                    </p>
+                    <a href="{{ url_for('logout') }}" class="btn btn-secondary">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

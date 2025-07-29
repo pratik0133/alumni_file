@@ -1,0 +1,404 @@
+{% extends "base.html" %}
+
+{% block title %}Success Stories - Alumni Connect{% endblock %}
+
+{% block content %}
+<style>
+    /* Modern Stories Theme */
+    .stories-wrapper {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background-image: url('https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=2000&q=80');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        position: relative;
+        padding: 2rem 0;
+    }
+
+    .stories-wrapper::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 1;
+    }
+
+    .stories-container {
+        position: relative;
+        z-index: 2;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .stories-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        background: linear-gradient(135deg, rgba(255, 107, 107, 0.9), rgba(78, 205, 196, 0.9));
+        padding: 2rem;
+        border-radius: 20px;
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stories-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        transform: rotate(45deg);
+        animation: shimmer 3s infinite;
+    }
+
+    @keyframes shimmer {
+        0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+        100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    }
+
+    .stories-header h1 {
+        color: white;
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        position: relative;
+        z-index: 2;
+    }
+
+    .stories-header p {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .share-story-btn {
+        background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        color: white;
+        font-weight: 600;
+        font-size: 1.1rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+        position: relative;
+        z-index: 2;
+    }
+
+    .share-story-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(255, 107, 107, 0.6);
+        color: white;
+        text-decoration: none;
+    }
+
+    .stories-grid {
+        display: grid;
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .story-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 2rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .story-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+        background-size: 300% 100%;
+        animation: gradientShift 3s ease infinite;
+    }
+
+    @keyframes gradientShift {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    .story-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+    .story-title {
+        color: white;
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        line-height: 1.3;
+    }
+
+    .story-content {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1.1rem;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+        max-height: 120px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .story-content::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 50px;
+        height: 20px;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1));
+    }
+
+    .story-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .story-author {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.95rem;
+    }
+
+    .author-avatar {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .story-date {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.9rem;
+        font-style: italic;
+    }
+
+    .featured-badge {
+        background: linear-gradient(135deg, #ffd700, #ffed4e);
+        color: #333;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        margin-top: 2rem;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        color: rgba(255, 255, 255, 0.6);
+        margin-bottom: 1.5rem;
+        display: block;
+    }
+
+    .empty-state h3 {
+        color: white;
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+
+    .empty-state p {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+
+    .empty-state .btn {
+        background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        color: white;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+    }
+
+    .empty-state .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(255, 107, 107, 0.6);
+        color: white;
+        text-decoration: none;
+    }
+
+    /* Floating decorative elements */
+    .floating-element {
+        position: absolute;
+        opacity: 0.1;
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .floating-element:nth-child(1) {
+        top: 10%;
+        left: 5%;
+        animation-delay: 0s;
+    }
+
+    .floating-element:nth-child(2) {
+        top: 20%;
+        right: 10%;
+        animation-delay: 2s;
+    }
+
+    .floating-element:nth-child(3) {
+        bottom: 30%;
+        left: 15%;
+        animation-delay: 4s;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(180deg); }
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+        .stories-container {
+            padding: 0 1rem;
+        }
+
+        .stories-header h1 {
+            font-size: 2.5rem;
+        }
+
+        .stories-header p {
+            font-size: 1rem;
+        }
+
+        .story-card {
+            padding: 1.5rem;
+        }
+
+        .story-title {
+            font-size: 1.5rem;
+        }
+
+        .story-content {
+            font-size: 1rem;
+        }
+
+        .story-meta {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+</style>
+
+<div class="stories-wrapper">
+    <!-- Floating decorative elements -->
+    <div class="floating-element">
+        <i class="fas fa-star" style="font-size: 2rem; color: #ffd700;"></i>
+    </div>
+    <div class="floating-element">
+        <i class="fas fa-heart" style="font-size: 1.5rem; color: #ff6b6b;"></i>
+    </div>
+    <div class="floating-element">
+        <i class="fas fa-lightbulb" style="font-size: 2.5rem; color: #4ecdc4;"></i>
+    </div>
+
+    <div class="stories-container">
+        <div class="stories-header">
+            <h1><i class="fas fa-book-open"></i> Success Stories</h1>
+            <p>Discover inspiring journeys and achievements from our amazing alumni community</p>
+        {% if current_user.is_authenticated and current_user.is_approved %}
+            <a href="{{ url_for('submit_story') }}" class="share-story-btn">
+                <i class="fas fa-plus"></i> Share Your Story
+            </a>
+        {% endif %}
+    </div>
+
+    {% if stories %}
+        <div class="stories-grid">
+        {% for story in stories %}
+            <div class="story-card">
+                <h3 class="story-title">{{ story.title }}</h3>
+                <div class="story-content">
+                    {{ story.content }}
+                </div>
+                <div class="story-meta">
+                    <div class="story-author">
+                        <div class="author-avatar">
+                            {{ story.author.first_name[0] }}{{ story.author.last_name[0] }}
+                        </div>
+                        <span>{{ story.author.first_name }} {{ story.author.last_name }}</span>
+                    </div>
+                    <div class="story-date">
+                        <i class="far fa-calendar-alt"></i>
+                        {{ story.created_at.strftime('%B %d, %Y') }}
+                    </div>
+                    {% if story.is_featured %}
+                    <div class="featured-badge">
+                        <i class="fas fa-star"></i> Featured
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-book-open"></i>
+            <h3>No Stories Published Yet</h3>
+            <p>Be the first to share your inspiring success story with the alumni community!</p>
+            {% if current_user.is_authenticated and current_user.is_approved %}
+            <a href="{{ url_for('submit_story') }}" class="btn">
+                <i class="fas fa-plus"></i> Share Your Story
+            </a>
+            {% endif %}
+        </div>
+    {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Alumni Connect{% endblock %}
+
+{% block content %}
+<style>
+    .register-container {
+        min-height: 100vh;
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.5) 100%),
+                    url('https://www.shutterstock.com/image-photo/businessman-smiling-using-tablet-glowing-circuit-2118803468') center/cover no-repeat;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 0;
+    }
+    
+    .register-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 3rem 2.5rem;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        max-width: 600px;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .register-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        transition: left 0.6s;
+    }
+    
+    .register-card:hover::before {
+        left: 100%;
+    }
+    
+    .register-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+    
+    .register-title {
+        color: white;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .register-subtitle {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 1.1rem;
+        font-weight: 300;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+    
+    .form-label {
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    
+    .form-control {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        padding: 1rem 1.2rem;
+        color: white;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+    }
+    
+    .form-control:focus {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: #4ecdc4;
+        box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.2);
+        color: white;
+        outline: none;
+    }
+    
+    .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .btn-register {
+        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+        border: none;
+        border-radius: 10px;
+        padding: 1rem 2rem;
+        color: white;
+        font-weight: 600;
+        font-size: 1.1rem;
+        width: 100%;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-register:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(255, 107, 107, 0.3);
+        color: white;
+    }
+    
+    .btn-register::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.6s;
+    }
+    
+    .btn-register:hover::before {
+        left: 100%;
+    }
+    
+    .login-link {
+        text-align: center;
+        margin-top: 2rem;
+        color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .login-link a {
+        color: #4ecdc4;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+    
+    .login-link a:hover {
+        color: #44a08d;
+        text-decoration: underline;
+    }
+    
+    .floating-elements {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        overflow: hidden;
+    }
+    
+    .floating-element {
+        position: absolute;
+        opacity: 0.1;
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    .floating-element:nth-child(1) {
+        top: 15%;
+        left: 10%;
+        animation-delay: 0s;
+    }
+    
+    .floating-element:nth-child(2) {
+        top: 45%;
+        right: 15%;
+        animation-delay: 2s;
+    }
+    
+    .floating-element:nth-child(3) {
+        bottom: 25%;
+        left: 20%;
+        animation-delay: 4s;
+    }
+    
+    .floating-element:nth-child(4) {
+        top: 70%;
+        right: 25%;
+        animation-delay: 1s;
+    }
+    
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0px) rotate(0deg);
+        }
+        50% {
+            transform: translateY(-20px) rotate(10deg);
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .register-card {
+            margin: 1rem;
+            padding: 2rem 1.5rem;
+        }
+        
+        .register-title {
+            font-size: 2rem;
+        }
+    }
+</style>
+
+<div class="register-container">
+    <div class="register-card">
+        <div class="floating-elements">
+            <div class="floating-element">
+                <i class="fas fa-graduation-cap fa-2x" style="color: #4ecdc4;"></i>
+            </div>
+            <div class="floating-element">
+                <i class="fas fa-user-plus fa-2x" style="color: #ff6b6b;"></i>
+            </div>
+            <div class="floating-element">
+                <i class="fas fa-network-wired fa-2x" style="color: #4ecdc4;"></i>
+            </div>
+            <div class="floating-element">
+                <i class="fas fa-handshake fa-2x" style="color: #ff6b6b;"></i>
+            </div>
+        </div>
+        
+        <div class="register-header">
+            <h1 class="register-title">Join Our Network</h1>
+            <p class="register-subtitle">Connect with fellow alumni and grow your professional network</p>
+                </div>
+        
+                    <form method="POST">
+                        <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                                <label for="first_name" class="form-label">First Name</label>
+                        <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Enter your first name" required>
+                    </div>
+                            </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                                <label for="last_name" class="form-label">Last Name</label>
+                        <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Enter your last name" required>
+                    </div>
+                            </div>
+                        </div>
+            
+            <div class="form-group">
+                <label for="email" class="form-label">Email Address</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email address" required>
+                        </div>
+            
+            <div class="form-group">
+                            <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Create a strong password" required>
+                        </div>
+            
+                        <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                                <label for="graduation_year" class="form-label">Graduation Year</label>
+                        <input type="number" class="form-control" id="graduation_year" name="graduation_year" min="1950" max="2030" placeholder="e.g., 2020" required>
+                            </div>
+                        </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="degree" class="form-label">Degree</label>
+                        <input type="text" class="form-control" id="degree" name="degree" placeholder="e.g., Bachelor of Science" required>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="department" class="form-label">Department</label>
+                <input type="text" class="form-control" id="department" name="department" placeholder="e.g., Computer Science" required>
+            </div>
+            
+            <button type="submit" class="btn btn-register">
+                <i class="fas fa-user-plus me-2"></i>Create Account
+            </button>
+        </form>
+        
+        <div class="login-link">
+            <p>Already have an account? <a href="{{ url_for('login') }}">Sign in here</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

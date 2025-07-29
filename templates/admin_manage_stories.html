@@ -1,0 +1,467 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Stories - Admin{% endblock %}
+
+{% block content %}
+<!-- Modern Admin Manage Stories Design Styles -->
+<style>
+body {
+    background: linear-gradient(120deg, rgba(40,40,60,0.92) 0%, rgba(60,60,80,0.92) 100%),
+                url('https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=2000&q=80') center center/cover no-repeat fixed !important;
+    min-height: 100vh;
+    position: relative;
+}
+.sidebar, .card, .modal-content {
+    background: rgba(44, 62, 80, 0.55) !important;
+    border-radius: 22px !important;
+    box-shadow: 0 8px 32px 0 rgba(31,38,135,0.22) !important;
+    backdrop-filter: blur(18px) !important;
+    -webkit-backdrop-filter: blur(18px) !important;
+    border: 1.5px solid rgba(255,255,255,0.18) !important;
+    color: #f8fafd !important;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.18);
+}
+.sidebar .nav-link {
+    color: #f8fafd !important;
+    font-weight: 500;
+    border-radius: 12px;
+    transition: background 0.2s, color 0.2s;
+}
+.sidebar .nav-link.active, .sidebar .nav-link:hover {
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%) !important;
+    color: #fff !important;
+    box-shadow: 0 2px 8px rgba(102,126,234,0.18) !important;
+}
+.card-header, .modal-header {
+    background: transparent !important;
+    border-bottom: 1px solid rgba(255,255,255,0.12) !important;
+}
+.card-body, .modal-body {
+    background: transparent !important;
+}
+.badge {
+    font-size: 0.95em;
+    border-radius: 8px;
+    padding: 0.4em 0.8em;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(102,126,234,0.10);
+}
+.btn-primary, .btn-info, .btn-success, .btn-warning, .btn-secondary, .btn-danger {
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+    box-shadow: 0 2px 8px rgba(102,126,234,0.10) !important;
+    transition: transform 0.2s, box-shadow 0.2s !important;
+}
+.btn-primary:hover, .btn-info:hover, .btn-success:hover, .btn-warning:hover, .btn-secondary:hover, .btn-danger:hover {
+    transform: translateY(-2px) scale(1.04) !important;
+    box-shadow: 0 6px 18px rgba(102,126,234,0.18) !important;
+}
+.h2, h1, h5, .modal-title {
+    color: #fff !important;
+    text-shadow: 0 4px 24px rgba(0,0,0,0.25);
+}
+.text-muted, .table .text-muted {
+    color: #b0b8c1 !important;
+}
+input.form-control, textarea.form-control, select.form-control {
+    background: rgba(255,255,255,0.12) !important;
+    color: #fff !important;
+    border-radius: 10px !important;
+    border: 1.5px solid rgba(255,255,255,0.18) !important;
+}
+input.form-control:focus, textarea.form-control:focus, select.form-control:focus {
+    background: rgba(255,255,255,0.18) !important;
+    color: #fff !important;
+    border-color: #667eea !important;
+    box-shadow: 0 0 0 2px #667eea44 !important;
+}
+::-webkit-input-placeholder { color: #e0e0e0 !important; }
+::-moz-placeholder { color: #e0e0e0 !important; }
+:-ms-input-placeholder { color: #e0e0e0 !important; }
+::placeholder { color: #e0e0e0 !important; }
+.story-preview {
+    max-height: 100px;
+    overflow: hidden;
+    position: relative;
+}
+.story-preview::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 20px;
+    background: linear-gradient(transparent, rgba(44, 62, 80, 0.8));
+}
+@media (max-width: 991px) {
+    .sidebar { margin-bottom: 2rem; }
+}
+@media (max-width: 767px) {
+    .h2, h1 { font-size: 1.5rem !important; }
+    .sidebar { padding: 1rem !important; }
+    .card, .modal-content { padding: 0.5rem !important; }
+}
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Admin Sidebar -->
+        <nav class="col-md-3 col-lg-2 d-md-block sidebar">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
+                            <i class="fas fa-dashboard"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('pending_users') }}">
+                            <i class="fas fa-user-clock"></i> Pending Users
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('manage_events') }}">
+                            <i class="fas fa-calendar"></i> Manage Events
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('manage_stories') }}">
+                            <i class="fas fa-pen"></i> Manage Stories
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Story Management</h1>
+                <div class="badge bg-warning fs-6">{{ stories|length if stories else 0 }} pending</div>
+            </div>
+
+            <!-- Stories Overview Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card bg-warning text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4>{{ stories|selectattr('is_approved', 'equalto', false)|list|length if stories else 0 }}</h4>
+                                    <p>Pending Stories</p>
+                                </div>
+                                <i class="fas fa-clock fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-success text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4>{{ stories|selectattr('is_approved', 'equalto', true)|list|length if stories else 0 }}</h4>
+                                    <p>Approved Stories</p>
+                                </div>
+                                <i class="fas fa-check-circle fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-info text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4>{{ stories|length if stories else 0 }}</h4>
+                                    <p>Total Stories</p>
+                                </div>
+                                <i class="fas fa-book fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-secondary text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4>{{ stories|selectattr('is_featured', 'equalto', true)|list|length if stories else 0 }}</h4>
+                                    <p>Featured Stories</p>
+                                </div>
+                                <i class="fas fa-star fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search/Filter Bar -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text" id="search-addon">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" class="form-control" id="storySearch" onkeyup="filterStories()" placeholder="Search stories..." aria-label="Search stories" aria-describedby="search-addon">
+                    </div>
+                </div>
+                <div class="col-md-6 text-end">
+                    <select class="form-select d-inline-block w-auto" id="statusFilter" onchange="filterStories()">
+                        <option value="">All Stories</option>
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                </div>
+            </div>
+
+            {% if stories %}
+                <div class="row">
+                    {% for story in stories %}
+                    <div class="col-lg-6 mb-4">
+                        <div class="card story-card" data-title="{{ story.title|lower }}" data-author="{{ story.author.first_name|lower }} {{ story.author.last_name|lower }}" data-status="{{ 'pending' if not story.is_approved else 'approved' }}">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">{{ story.title }}</h5>
+                                {% if story.is_approved %}
+                                    <span class="badge bg-success">Approved</span>
+                                {% else %}
+                                    <span class="badge bg-warning">Pending</span>
+                                {% endif %}
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <p class="card-text">
+                                            <strong>Author:</strong><br>
+                                            <span class="text-muted">{{ story.author.first_name }} {{ story.author.last_name }}</span>
+                                        </p>
+                                        <p class="card-text">
+                                            <strong>Category:</strong><br>
+                                            <span class="text-muted">{{ story.category or 'General' }}</span>
+                                        </p>
+                                        <p class="card-text">
+                                            <strong>Submitted:</strong><br>
+                                            <span class="text-muted">{{ story.created_at.strftime('%B %d, %Y') }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <p class="card-text">
+                                            <strong>Status:</strong><br>
+                                            <span class="text-muted">{{ 'Approved' if story.is_approved else 'Pending Review' }}</span>
+                                        </p>
+                                        <p class="card-text">
+                                            <strong>Featured:</strong><br>
+                                            <span class="text-muted">{{ 'Yes' if story.is_featured else 'No' }}</span>
+                                        </p>
+                                        <p class="card-text">
+                                            <strong>Days Ago:</strong><br>
+                                            <span class="text-muted">{{ (moment().utc() - story.created_at).days if moment else 'N/A' }} days</span>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <strong>Preview:</strong>
+                                    <div class="story-preview text-muted">
+                                        {{ story.content[:200] }}{% if story.content|length > 200 %}...{% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer d-flex justify-content-between">
+                                {% if not story.is_approved %}
+                                    <a href="{{ url_for('approve_story', story_id=story.id) }}" 
+                                       class="btn btn-success btn-sm"
+                                       onclick="return confirm('Are you sure you want to approve this story?')"
+                                       title="Approve this story">
+                                        <i class="fas fa-check"></i> Approve
+                                    </a>
+                                    <button class="btn btn-danger btn-sm"
+                                            onclick="rejectStory({{ story.id }})"
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#rejectStoryModal{{ story.id }}"
+                                            title="Reject this story">
+                                        <i class="fas fa-times"></i> Reject
+                                    </button>
+                                {% else %}
+                                    <button class="btn btn-warning btn-sm"
+                                            onclick="unapproveStory({{ story.id }})"
+                                            title="Unapprove this story">
+                                        <i class="fas fa-undo"></i> Unapprove
+                                    </button>
+                                    <button class="btn btn-info btn-sm"
+                                            onclick="toggleFeatured({{ story.id }})"
+                                            title="{{ 'Remove from featured' if story.is_featured else 'Mark as featured' }}">
+                                        <i class="fas fa-star"></i> {{ 'Unfeature' if story.is_featured else 'Feature' }}
+                                    </button>
+                                {% endif %}
+                                <button class="btn btn-info btn-sm"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#viewStoryModal{{ story.id }}"
+                                        title="View full story">
+                                    <i class="fas fa-eye"></i> View Full
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- View Story Modal -->
+                    <div class="modal fade" id="viewStoryModal{{ story.id }}" tabindex="-1">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">{{ story.title }}</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <p><strong>Author:</strong> {{ story.author.first_name }} {{ story.author.last_name }}</p>
+                                            <p><strong>Category:</strong> {{ story.category or 'General' }}</p>
+                                            <p><strong>Submitted:</strong> {{ story.created_at.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p><strong>Status:</strong> {{ 'Approved' if story.is_approved else 'Pending Review' }}</p>
+                                            <p><strong>Featured:</strong> {{ 'Yes' if story.is_featured else 'No' }}</p>
+                                            <p><strong>Email:</strong> {{ story.author.email }}</p>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                                                         <h6>Story Content:</h6>
+                                     <div class="story-content">
+                                         {{ story.content|replace('\n', '<br>')|safe }}
+                                     </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    {% if not story.is_approved %}
+                                        <a href="{{ url_for('approve_story', story_id=story.id) }}" 
+                                           class="btn btn-success"
+                                           onclick="return confirm('Are you sure you want to approve this story?')">
+                                            <i class="fas fa-check"></i> Approve Story
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reject Story Modal -->
+                    <div class="modal fade" id="rejectStoryModal{{ story.id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Reject Story</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Are you sure you want to reject the story "<strong>{{ story.title }}</strong>"?</p>
+                                    <div class="mb-3">
+                                        <label for="rejectionReason{{ story.id }}" class="form-label">Reason for rejection (optional):</label>
+                                        <textarea class="form-control" id="rejectionReason{{ story.id }}" rows="3" 
+                                                  placeholder="Enter reason for rejection..."></textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="button" class="btn btn-danger" onclick="confirmRejectStory({{ story.id }})">
+                                        <i class="fas fa-times"></i> Reject Story
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Bulk Actions -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5>Bulk Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <button class="btn btn-success" onclick="approveAllStories()">
+                                    <i class="fas fa-check-double"></i> Approve All Pending
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-info" onclick="featureAllApproved()">
+                                    <i class="fas fa-star"></i> Feature All Approved
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-muted">
+                                    <small>Use bulk actions carefully. These actions cannot be undone.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-book fa-3x text-muted mb-3"></i>
+                    <h4>No stories yet!</h4>
+                    <p class="text-muted">No stories have been submitted for review.</p>
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-primary">Back to Dashboard</a>
+                </div>
+            {% endif %}
+        </main>
+    </div>
+</div>
+
+<script>
+function filterStories() {
+    var searchInput = document.getElementById('storySearch').value.toLowerCase();
+    var statusFilter = document.getElementById('statusFilter').value;
+    var cards = document.querySelectorAll('.story-card');
+    
+    cards.forEach(function(card) {
+        var title = card.getAttribute('data-title');
+        var author = card.getAttribute('data-author');
+        var status = card.getAttribute('data-status');
+        
+        var matchesSearch = title.includes(searchInput) || author.includes(searchInput);
+        var matchesStatus = !statusFilter || status === statusFilter;
+        
+        if (matchesSearch && matchesStatus) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+function confirmRejectStory(storyId) {
+    const reason = document.getElementById('rejectionReason' + storyId).value;
+    if (confirm('Are you sure you want to reject this story?')) {
+        alert('Story rejection functionality would be implemented here with reason: ' + reason);
+    }
+}
+
+function approveAllStories() {
+    if (confirm('Are you sure you want to approve ALL pending stories? This action cannot be undone.')) {
+        alert('Bulk story approval functionality would be implemented here');
+    }
+}
+
+function featureAllApproved() {
+    if (confirm('Are you sure you want to feature ALL approved stories? This action cannot be undone.')) {
+        alert('Bulk story featuring functionality would be implemented here');
+    }
+}
+
+function unapproveStory(storyId) {
+    if (confirm('Are you sure you want to unapprove this story?')) {
+        alert('Story unapproval functionality would be implemented here');
+    }
+}
+
+function toggleFeatured(storyId) {
+    if (confirm('Are you sure you want to change the featured status of this story?')) {
+        alert('Story featuring functionality would be implemented here');
+    }
+}
+</script>
+{% endblock %}
+

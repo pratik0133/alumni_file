@@ -1,0 +1,416 @@
+{% extends "base.html" %}
+
+{% block title %}Events - Alumni Connect{% endblock %}
+
+{% block content %}
+<!-- Modern Events Page Design Styles -->
+<style>
+body {
+    background: linear-gradient(120deg, rgba(40,40,60,0.92) 0%, rgba(60,60,80,0.92) 100%),
+                url('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=2000&q=80') center center/cover no-repeat fixed !important;
+    min-height: 100vh;
+    position: relative;
+}
+.events-wrapper {
+    position: relative;
+    z-index: 2;
+    padding: 2rem 0;
+}
+.events-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+.events-title {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 4px 24px rgba(0,0,0,0.25);
+    margin-bottom: 1rem;
+}
+.events-subtitle {
+    color: #e0e0e0;
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+}
+.search-section {
+    background: rgba(255,255,255,0.15);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px 0 rgba(31,38,135,0.18);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.18);
+    padding: 2rem;
+    margin-bottom: 3rem;
+}
+.search-input {
+    background: rgba(255,255,255,0.12) !important;
+    color: #fff !important;
+    border-radius: 12px !important;
+    border: 1.5px solid rgba(255,255,255,0.18) !important;
+    padding: 0.75rem 1rem !important;
+}
+.search-input:focus {
+    background: rgba(255,255,255,0.18) !important;
+    border-color: #667eea !important;
+    box-shadow: 0 0 0 2px #667eea44 !important;
+}
+.search-input::placeholder {
+    color: #e0e0e0 !important;
+}
+.event-card {
+    background: rgba(255,255,255,0.18);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px 0 rgba(31,38,135,0.18);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.18);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    position: relative;
+}
+.event-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 16px 48px 0 rgba(31,38,135,0.25);
+}
+.event-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+}
+.event-card.past-event::before {
+    background: linear-gradient(90deg, #6c757d 0%, #495057 100%);
+}
+.event-card-body {
+    padding: 2rem;
+    color: #f8fafd;
+}
+.event-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 1rem;
+    line-height: 1.3;
+}
+.event-description {
+    color: #e0e0e0;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+.event-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+}
+.event-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #b0b8c1;
+    font-size: 0.95rem;
+}
+.event-meta-item i {
+    color: #667eea;
+    width: 16px;
+}
+.countdown-timer {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+}
+.event-footer {
+    padding: 1.5rem 2rem;
+    background: rgba(255,255,255,0.05);
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+.btn-register {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+}
+.btn-register:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102,126,234,0.4);
+    color: white;
+}
+.btn-register:disabled {
+    background: rgba(255,255,255,0.2);
+    color: #b0b8c1;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+.section-title {
+    color: #fff;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    text-shadow: 0 4px 24px rgba(0,0,0,0.25);
+    position: relative;
+}
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    border-radius: 2px;
+}
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: rgba(255,255,255,0.1);
+    border-radius: 24px;
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.18);
+}
+.empty-state i {
+    font-size: 4rem;
+    color: #667eea;
+    margin-bottom: 1rem;
+}
+.empty-state h4 {
+    color: #fff;
+    margin-bottom: 1rem;
+}
+.empty-state p {
+    color: #e0e0e0;
+    font-size: 1.1rem;
+}
+@media (max-width: 768px) {
+    .events-title { font-size: 2rem; }
+    .section-title { font-size: 1.5rem; }
+    .event-card-body { padding: 1.5rem; }
+    .event-footer { padding: 1rem 1.5rem; }
+}
+</style>
+
+<div class="events-wrapper">
+    <div class="container">
+        <!-- Header Section -->
+        <div class="events-header">
+            <h1 class="events-title">Alumni Events</h1>
+            <p class="events-subtitle">Connect, network, and grow with fellow alumni at our exciting events</p>
+        </div>
+
+        <!-- Search and Filter Section -->
+        <div class="search-section">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="input-group">
+                        <span class="input-group-text" style="background: rgba(255,255,255,0.1); border: 1.5px solid rgba(255,255,255,0.18); color: #667eea;">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" class="form-control search-input" id="eventSearch" placeholder="Search events by title, location, or description..." onkeyup="filterEvents()">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <select class="form-control search-input" id="eventFilter" onchange="filterEvents()">
+                        <option value="">All Events</option>
+                        <option value="upcoming">Upcoming Events</option>
+                        <option value="past">Past Events</option>
+                        <option value="free">Free Events</option>
+                        <option value="paid">Paid Events</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Events Section -->
+        <div class="upcoming-events-section">
+            <h2 class="section-title">Upcoming Events</h2>
+            {% if upcoming_events %}
+                <div class="row" id="upcomingEvents">
+                    {% for event in upcoming_events %}
+                    <div class="col-lg-4 col-md-6 mb-4 event-item" data-title="{{ event.title|lower }}" data-location="{{ event.location|lower }}" data-description="{{ event.description|lower }}" data-type="{{ 'free' if event.registration_fee == 0 else 'paid' }}" data-category="upcoming">
+                        <div class="event-card">
+                            <div class="event-card-body">
+                                <h5 class="event-title">{{ event.title }}</h5>
+                                <p class="event-description">{{ event.description[:120] }}{% if event.description|length > 120 %}...{% endif %}</p>
+                                
+                                <div class="countdown-timer" id="countdown-{{ event.id }}">
+                                    <i class="fas fa-clock me-2"></i>
+                                    <span id="timer-{{ event.id }}">Loading...</span>
+                                </div>
+                                
+                                <div class="event-meta">
+                                    <div class="event-meta-item">
+                                        <i class="fas fa-calendar"></i>
+                                        <span>{{ event.date.strftime('%B %d, %Y at %I:%M %p') }}</span>
+                                    </div>
+                                    <div class="event-meta-item">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>{{ event.location }}</span>
+                                    </div>
+                                    <div class="event-meta-item">
+                                        {% if event.registration_fee > 0 %}
+                                            <i class="fas fa-dollar-sign"></i>
+                                            <span>${{ "%.2f"|format(event.registration_fee) }}</span>
+                                        {% else %}
+                                            <i class="fas fa-gift"></i>
+                                            <span>Free Event</span>
+                                        {% endif %}
+                                    </div>
+                                    {% if event.max_attendees %}
+                                    <div class="event-meta-item">
+                                        <i class="fas fa-users"></i>
+                                        <span>{{ event.registrations|length }}/{{ event.max_attendees }} registered</span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="event-footer">
+                                {% if current_user.is_authenticated and current_user.is_approved %}
+                                    <a href="{{ url_for('register_event', event_id=event.id) }}" class="btn btn-register w-100" onclick="showLoading(this)">
+                                        <i class="fas fa-ticket-alt me-2"></i>Register Now
+                                    </a>
+                                {% else %}
+                                    <button class="btn btn-register w-100" disabled>
+                                        <i class="fas fa-lock me-2"></i>Login to Register
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-calendar-times"></i>
+                    <h4>No Upcoming Events</h4>
+                    <p>Check back soon for exciting alumni events and networking opportunities!</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Past Events Section -->
+        {% if past_events %}
+        <div class="past-events-section mt-5">
+            <h2 class="section-title">Past Events</h2>
+            <div class="row" id="pastEvents">
+                {% for event in past_events %}
+                <div class="col-lg-4 col-md-6 mb-4 event-item" data-title="{{ event.title|lower }}" data-location="{{ event.location|lower }}" data-description="{{ event.description|lower }}" data-type="{{ 'free' if event.registration_fee == 0 else 'paid' }}" data-category="past">
+                    <div class="event-card past-event">
+                        <div class="event-card-body">
+                            <h5 class="event-title">{{ event.title }}</h5>
+                            <p class="event-description">{{ event.description[:120] }}{% if event.description|length > 120 %}...{% endif %}</p>
+                            
+                            <div class="event-meta">
+                                <div class="event-meta-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>{{ event.date.strftime('%B %d, %Y') }}</span>
+                                </div>
+                                <div class="event-meta-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>{{ event.location }}</span>
+                                </div>
+                                <div class="event-meta-item">
+                                    <i class="fas fa-users"></i>
+                                    <span>{{ event.registrations|length }} attended</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="event-footer">
+                            <span class="badge bg-secondary" style="background: rgba(255,255,255,0.2) !important; color: #e0e0e0;">
+                                <i class="fas fa-history me-1"></i>Past Event
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+// Event filtering functionality
+function filterEvents() {
+    const searchTerm = document.getElementById('eventSearch').value.toLowerCase();
+    const filterType = document.getElementById('eventFilter').value;
+    const eventItems = document.querySelectorAll('.event-item');
+    
+    eventItems.forEach(item => {
+        const title = item.getAttribute('data-title');
+        const location = item.getAttribute('data-location');
+        const description = item.getAttribute('data-description');
+        const type = item.getAttribute('data-type');
+        const category = item.getAttribute('data-category');
+        
+        const matchesSearch = title.includes(searchTerm) || 
+                            location.includes(searchTerm) || 
+                            description.includes(searchTerm);
+        
+        const matchesFilter = !filterType || 
+                            (filterType === 'upcoming' && category === 'upcoming') ||
+                            (filterType === 'past' && category === 'past') ||
+                            (filterType === 'free' && type === 'free') ||
+                            (filterType === 'paid' && type === 'paid');
+        
+        if (matchesSearch && matchesFilter) {
+            item.style.display = '';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+// Countdown timer functionality
+function updateCountdown(eventId, eventDate) {
+    const now = new Date().getTime();
+    const eventTime = new Date(eventDate).getTime();
+    const distance = eventTime - now;
+    
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    
+    const timerElement = document.getElementById(`timer-${eventId}`);
+    if (timerElement) {
+        if (distance < 0) {
+            timerElement.innerHTML = '<i class="fas fa-check-circle me-2"></i>Event Started';
+        } else {
+            timerElement.innerHTML = `${days}d ${hours}h ${minutes}m`;
+        }
+    }
+}
+
+// Initialize countdown timers
+document.addEventListener('DOMContentLoaded', function() {
+    {% for event in upcoming_events %}
+        updateCountdown({{ event.id }}, '{{ event.date.isoformat() }}');
+        setInterval(() => updateCountdown({{ event.id }}, '{{ event.date.isoformat() }}'), 60000); // Update every minute
+    {% endfor %}
+});
+
+// Loading state for registration buttons
+function showLoading(button) {
+    const originalText = button.innerHTML;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Registering...';
+    button.disabled = true;
+    
+    // Re-enable after 3 seconds (in case of error)
+    setTimeout(() => {
+        button.innerHTML = originalText;
+        button.disabled = false;
+    }, 3000);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- Hero Section with Background Image -->
+<section class="hero-section">
+    <div class="hero-content">
+        <h1 class="hero-title">Welcome to Alumni Connect</h1>
+        <p class="hero-subtitle">Stay connected with your alma mater and fellow alumni</p>
+        <div class="hero-buttons">
+        {% if not current_user.is_authenticated %}
+            <a href="{{ url_for('register') }}" class="btn-hero btn-hero-primary me-3">Join Now</a>
+            <a href="{{ url_for('login') }}" class="btn-hero btn-hero-secondary">Login</a>
+        {% endif %}
+        </div>
+    </div>
+    
+    <!-- Floating Elements for Visual Appeal -->
+    <div class="floating-element">
+        <i class="fas fa-graduation-cap fa-3x"></i>
+    </div>
+    <div class="floating-element">
+        <i class="fas fa-users fa-2x"></i>
+    </div>
+    <div class="floating-element">
+        <i class="fas fa-handshake fa-2x"></i>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+    <div class="container">
+        <h2 class="section-title text-center">What We Offer</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="feature-title">Networking</h3>
+                    <p class="feature-description">Connect with alumni from different batches and industries.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <h3 class="feature-title">Job Portal</h3>
+                    <p class="feature-description">Find job opportunities posted by fellow alumni.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-calendar"></i>
+                    </div>
+                    <h3 class="feature-title">Events</h3>
+                    <p class="feature-description">Join reunions, workshops, and networking events.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Stories -->
+{% if stories %}
+<section class="stories-section">
+    <div class="container">
+        <h2 class="section-title text-center">Success Stories</h2>
+        <div class="row">
+            {% for story in stories %}
+            <div class="col-md-4 mb-4">
+                <div class="story-card">
+                    <h3 class="story-title">{{ story.title }}</h3>
+                    <p class="story-content">{{ story.content[:150] }}...</p>
+                    <p class="story-author">By {{ story.author.first_name }} {{ story.author.last_name }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center">
+            <a href="{{ url_for('stories') }}" class="view-all-btn">View All Stories</a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Upcoming Events -->
+{% if events %}
+<section class="events-section">
+    <div class="container">
+        <h2 class="section-title text-center">Upcoming Events</h2>
+        <div class="row">
+            {% for event in events %}
+            <div class="col-md-4 mb-4">
+                <div class="event-card">
+                    <div class="event-card-body">
+                        <h3 class="event-title">{{ event.title }}</h3>
+                        <p class="event-description">{{ event.description[:100] }}...</p>
+                        <div class="event-meta">
+                            <div class="event-meta-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>{{ event.date.strftime('%B %d, %Y') }}</span>
+                            </div>
+                            <div class="event-meta-item">
+                                <i class="fas fa-location-dot"></i>
+                                <span>{{ event.location }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center">
+            <a href="{{ url_for('events') }}" class="view-all-btn">View All Events</a>
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

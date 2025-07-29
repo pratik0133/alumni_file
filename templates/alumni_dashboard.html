@@ -1,0 +1,500 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Alumni Connect{% endblock %}
+
+{% block content %}
+<style>
+    /* Modern Dashboard Theme */
+    .dashboard-wrapper {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+    }
+    
+    .dashboard-container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    
+    /* Sidebar Styling */
+    .dashboard-sidebar {
+        background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+        padding: 2rem 1rem;
+        min-height: 100vh;
+        position: relative;
+    }
+    
+    .sidebar-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .sidebar-title {
+        color: white;
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    .sidebar-subtitle {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.8rem;
+        margin: 0;
+    }
+    
+    .nav-item {
+        margin-bottom: 0.5rem;
+    }
+    
+    .nav-link {
+        color: rgba(255, 255, 255, 0.8) !important;
+        padding: 0.75rem 1rem;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-weight: 500;
+    }
+    
+    .nav-link:hover {
+        color: white !important;
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateX(5px);
+    }
+    
+    .nav-link.active {
+        background: linear-gradient(45deg, #3498db, #2980b9);
+        color: white !important;
+        box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+    }
+    
+    .nav-link i {
+        width: 20px;
+        text-align: center;
+    }
+    
+    /* Main Content */
+    .dashboard-main {
+        padding: 2rem;
+        background: #f8f9fa;
+    }
+    
+    .welcome-section {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .welcome-section::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="80" r="1" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+        animation: float 20s infinite linear;
+    }
+    
+    @keyframes float {
+        0% { transform: translateY(0px) rotate(0deg); }
+        100% { transform: translateY(-20px) rotate(360deg); }
+    }
+    
+    .welcome-content {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .welcome-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .welcome-subtitle {
+        font-size: 1rem;
+        opacity: 0.9;
+    }
+    
+    /* Stats Cards */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        border: none;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(45deg, var(--card-color), var(--card-color-light));
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+    
+    .stat-card.donations {
+        --card-color: #e74c3c;
+        --card-color-light: #c0392b;
+    }
+    
+    .stat-card.jobs {
+        --card-color: #27ae60;
+        --card-color-light: #229954;
+    }
+    
+    .stat-card.events {
+        --card-color: #3498db;
+        --card-color-light: #2980b9;
+    }
+    
+    .stat-card.status {
+        --card-color: #f39c12;
+        --card-color-light: #e67e22;
+    }
+    
+    .stat-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .stat-info h3 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin: 0;
+        color: var(--card-color);
+    }
+    
+    .stat-info p {
+        color: #6c757d;
+        margin: 0;
+        font-weight: 500;
+    }
+    
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, var(--card-color), var(--card-color-light));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+    }
+    
+    /* Events Section */
+    .events-section {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    
+    .events-header {
+        background: linear-gradient(45deg, #2c3e50, #34495e);
+        color: white;
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .events-header h5 {
+        margin: 0;
+        font-weight: 600;
+    }
+    
+    .events-body {
+        padding: 1.5rem;
+    }
+    
+    .events-table {
+        margin: 0;
+    }
+    
+    .events-table th {
+        background: #f8f9fa;
+        border: none;
+        padding: 1rem;
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .events-table td {
+        padding: 1rem;
+        border: none;
+        border-bottom: 1px solid #e9ecef;
+        vertical-align: middle;
+    }
+    
+    .events-table tr:hover {
+        background: #f8f9fa;
+    }
+    
+    .register-btn {
+        background: linear-gradient(45deg, #3498db, #2980b9);
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        color: white;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .register-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        color: white;
+    }
+    
+    .no-events {
+        text-align: center;
+        padding: 3rem;
+        color: #6c757d;
+    }
+    
+    .no-events i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .dashboard-wrapper {
+            padding: 10px;
+        }
+        
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .welcome-title {
+            font-size: 1.5rem;
+        }
+        
+        .stat-info h3 {
+            font-size: 2rem;
+        }
+    }
+</style>
+
+<div class="dashboard-wrapper">
+    <div class="dashboard-container">
+        <div class="row g-0">
+        <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2">
+                <div class="dashboard-sidebar">
+                    <div class="sidebar-header">
+                        <h6 class="sidebar-title">Alumni Connect</h6>
+                        <p class="sidebar-subtitle">Dashboard</p>
+                    </div>
+                    
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('alumni_dashboard') }}">
+                                <i class="fas fa-tachometer-alt"></i>
+                                <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('profile') }}">
+                                <i class="fas fa-user-circle"></i>
+                                <span>Profile</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('donate') }}">
+                                <i class="fas fa-heart"></i>
+                                <span>Donate</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('post_job') }}">
+                                <i class="fas fa-briefcase"></i>
+                                <span>Post Job</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('submit_story') }}">
+                                <i class="fas fa-pen-fancy"></i>
+                                <span>Share Story</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('directory') }}">
+                                <i class="fas fa-users"></i>
+                                <span>Directory</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('events') }}">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>Events</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('stories') }}">
+                                <i class="fas fa-book-open"></i>
+                                <span>Stories</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10">
+                <div class="dashboard-main">
+                    <!-- Welcome Section -->
+                    <div class="welcome-section">
+                        <div class="welcome-content">
+                            <h1 class="welcome-title">Welcome back, {{ current_user.first_name }}! 👋</h1>
+                            <p class="welcome-subtitle">Here's what's happening in your alumni community today</p>
+                        </div>
+            </div>
+
+            <!-- Stats Cards -->
+                    <div class="stats-grid">
+                        <div class="stat-card donations">
+                            <div class="stat-content">
+                                <div class="stat-info">
+                                    <h3>{{ donations_count }}</h3>
+                                    <p>Donations Made</p>
+                                </div>
+                                <div class="stat-icon">
+                                    <i class="fas fa-heart"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card jobs">
+                            <div class="stat-content">
+                                <div class="stat-info">
+                                    <h3>{{ jobs_count }}</h3>
+                                    <p>Jobs Posted</p>
+                                </div>
+                                <div class="stat-icon">
+                                    <i class="fas fa-briefcase"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card events">
+                            <div class="stat-content">
+                                <div class="stat-info">
+                                    <h3>{{ upcoming_events|length }}</h3>
+                                    <p>Upcoming Events</p>
+                                </div>
+                                <div class="stat-icon">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card status">
+                            <div class="stat-content">
+                                <div class="stat-info">
+                                    <h3>Active</h3>
+                                    <p>Account Status</p>
+                                </div>
+                                <div class="stat-icon">
+                                    <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upcoming Events -->
+                    <div class="events-section">
+                        <div class="events-header">
+                            <i class="fas fa-calendar-check"></i>
+                            <h5>Upcoming Events</h5>
+                        </div>
+                        <div class="events-body">
+                            {% if upcoming_events %}
+                                <div class="table-responsive">
+                                    <table class="table events-table">
+                                        <thead>
+                                            <tr>
+                                                <th><i class="fas fa-calendar"></i> Event</th>
+                                                <th><i class="fas fa-clock"></i> Date</th>
+                                                <th><i class="fas fa-map-marker-alt"></i> Location</th>
+                                                <th><i class="fas fa-cog"></i> Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for event in upcoming_events %}
+                                            <tr>
+                                                <td>
+                                                    <strong>{{ event.title }}</strong>
+                                                    {% if event.description %}
+                                                        <br><small class="text-muted">{{ event.description[:50] }}{% if event.description|length > 50 %}...{% endif %}</small>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-primary">{{ event.date.strftime('%B %d, %Y') }}</span>
+                                                    <br><small class="text-muted">{{ event.date.strftime('%I:%M %p') }}</small>
+                                                </td>
+                                                <td>
+                                                    <i class="fas fa-map-marker-alt text-danger"></i>
+                                                    {{ event.location or 'TBD' }}
+                                                </td>
+                                                <td>
+                                                    <a href="{{ url_for('register_event', event_id=event.id) }}" class="btn register-btn">
+                                                        <i class="fas fa-sign-in-alt"></i> Register
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="no-events">
+                                    <i class="fas fa-calendar-times"></i>
+                                    <h5>No upcoming events</h5>
+                                    <p>Check back later for new events or browse our events page</p>
+                                    <a href="{{ url_for('events') }}" class="btn btn-outline-primary">
+                                        <i class="fas fa-calendar-plus"></i> View All Events
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

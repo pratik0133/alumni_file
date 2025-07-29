@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Alumni Connect{% endblock %}
+
+{% block content %}
+<!-- Improved Admin Dashboard Design Styles for Cohesion -->
+<style>
+body {
+    background: linear-gradient(120deg, rgba(40,40,60,0.92) 0%, rgba(60,60,80,0.92) 100%),
+                url('https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=2000&q=80') center center/cover no-repeat fixed !important;
+    min-height: 100vh;
+    position: relative;
+}
+.admin-glass, .card, .glass-card, .quick-actions-card, .stat-card {
+    background: rgba(44, 62, 80, 0.55) !important;
+    border-radius: 22px !important;
+    box-shadow: 0 8px 32px 0 rgba(31,38,135,0.22) !important;
+    backdrop-filter: blur(18px) !important;
+    -webkit-backdrop-filter: blur(18px) !important;
+    border: 1.5px solid rgba(255,255,255,0.18) !important;
+    color: #f8fafd !important;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.18);
+}
+.admin-sidebar {
+    background: rgba(44, 62, 80, 0.65) !important;
+    border-radius: 22px !important;
+    box-shadow: 0 8px 32px 0 rgba(31,38,135,0.22) !important;
+    backdrop-filter: blur(18px) !important;
+    -webkit-backdrop-filter: blur(18px) !important;
+    border: 1.5px solid rgba(255,255,255,0.18) !important;
+    min-height: 500px;
+    padding: 2rem 1rem 1rem 1rem;
+}
+.admin-sidebar .nav-link {
+    color: #f8fafd !important;
+    font-weight: 500;
+    border-radius: 12px;
+    transition: background 0.2s, color 0.2s;
+}
+.admin-sidebar .nav-link.active, .admin-sidebar .nav-link:hover {
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%) !important;
+    color: #fff !important;
+    box-shadow: 0 2px 8px rgba(102,126,234,0.18) !important;
+}
+.stat-icon {
+    font-size: 2.5rem;
+    color: #fff;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 16px;
+    padding: 0.7rem 1rem;
+    box-shadow: 0 2px 8px rgba(102,126,234,0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(255,255,255,0.18);
+}
+.stat-pending .stat-icon { background: linear-gradient(135deg, #ffb347 0%, #ffcc33 100%); color: #fff; }
+.stat-donations .stat-icon { background: linear-gradient(135deg, #ff6a6a 0%, #ffb347 100%); color: #fff; }
+.stat-jobs .stat-icon { background: linear-gradient(135deg, #4ecdc4 0%, #556270 100%); color: #fff; }
+.stat-alumni .stat-icon { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; }
+.admin-title, .admin-header h1, .admin-header .h2 {
+    color: #fff !important;
+    text-shadow: 0 4px 24px rgba(0,0,0,0.25);
+}
+.admin-subtitle {
+    color: #e0e0e0 !important;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.18);
+}
+.quick-actions-card h5 {
+    color: #fff !important;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.18);
+}
+.quick-actions-card .btn {
+    font-weight: 600;
+    font-size: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(102,126,234,0.10);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.quick-actions-card .btn:hover {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 6px 18px rgba(102,126,234,0.18);
+}
+@media (max-width: 991px) {
+    .admin-sidebar { margin-bottom: 2rem; }
+}
+@media (max-width: 767px) {
+    .admin-header { margin-top: 0.5rem; }
+    .stat-card { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+    .quick-actions-card { padding: 1rem; }
+}
+</style>
+
+<div class="admin-dashboard-bg">
+    <div class="admin-dashboard-overlay"></div>
+    <div class="container-fluid admin-dashboard-wrapper py-5">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block admin-sidebar glass-card mb-4 mb-md-0">
+                <div class="position-sticky pt-4">
+                    <ul class="nav flex-column">
+                        <li class="nav-item mb-2">
+                            <a class="nav-link active" href="{{ url_for('admin_dashboard') }}">
+                                <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a class="nav-link" href="{{ url_for('pending_users') }}">
+                                <i class="fas fa-user-clock me-2"></i> Pending Users
+                            </a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a class="nav-link" href="{{ url_for('manage_events') }}">
+                                <i class="fas fa-calendar me-2"></i> Manage Events
+                            </a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a class="nav-link" href="{{ url_for('manage_stories') }}">
+                                <i class="fas fa-pen me-2"></i> Manage Stories
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            <!-- Main Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="admin-header mb-4">
+                    <h1 class="admin-title mb-1">Admin Dashboard</h1>
+                    <p class="admin-subtitle">Welcome, {{ current_user.first_name or 'Admin' }}! Manage your alumni network efficiently.</p>
+                </div>
+                <!-- Stats Cards -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-3">
+                        <div class="glass-card stat-card stat-pending">
+                            <div class="stat-icon"><i class="fas fa-user-clock"></i></div>
+                            <div class="stat-info">
+                                <h4>{{ pending_users }}</h4>
+                                <span>Pending Approvals</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="glass-card stat-card stat-donations">
+                            <div class="stat-icon"><i class="fas fa-heart"></i></div>
+                            <div class="stat-info">
+                                <h4>${{ "%.2f"|format(total_donations) }}</h4>
+                                <span>Total Donations</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="glass-card stat-card stat-jobs">
+                            <div class="stat-icon"><i class="fas fa-briefcase"></i></div>
+                            <div class="stat-info">
+                                <h4>{{ active_jobs }}</h4>
+                                <span>Active Jobs</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="glass-card stat-card stat-alumni">
+                            <div class="stat-icon"><i class="fas fa-users"></i></div>
+                            <div class="stat-info">
+                                <h4>{{ total_alumni }}</h4>
+                                <span>Total Alumni</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Quick Actions -->
+                <div class="glass-card quick-actions-card mb-4">
+                    <h5 class="mb-3"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <a href="{{ url_for('pending_users') }}" class="btn btn-warning w-100"><i class="fas fa-user-clock me-1"></i> Review Pending Users</a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{{ url_for('manage_events') }}" class="btn btn-info w-100"><i class="fas fa-calendar-plus me-1"></i> Create New Event</a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{{ url_for('manage_stories') }}" class="btn btn-success w-100"><i class="fas fa-pen me-1"></i> Review Stories</a>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-primary w-100" onclick="generateReport()"><i class="fas fa-file-alt me-1"></i> Generate Report</button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</div>
+
+<script>
+function generateReport() {
+    alert('Report generation feature would be implemented here.');
+}
+</script>
+{% endblock %}

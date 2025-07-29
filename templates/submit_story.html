@@ -1,0 +1,434 @@
+{% extends "base.html" %}
+
+{% block title %}Submit Story - Alumni Connect{% endblock %}
+
+{% block content %}
+<style>
+    /* Modern Submit Story Theme */
+    .submit-story-wrapper {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background-image: url('https://images.unsplash.com/photo-1455390582262-044cdead277a?w=2000&q=80');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        position: relative;
+        padding: 2rem 0;
+    }
+
+    .submit-story-wrapper::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 1;
+    }
+
+    .submit-story-container {
+        position: relative;
+        z-index: 2;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .submit-story-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        background: linear-gradient(135deg, rgba(255, 107, 107, 0.9), rgba(78, 205, 196, 0.9));
+        padding: 2.5rem;
+        border-radius: 20px;
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .submit-story-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        transform: rotate(45deg);
+        animation: shimmer 3s infinite;
+    }
+
+    @keyframes shimmer {
+        0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+        100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    }
+
+    .submit-story-header h1 {
+        color: white;
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        position: relative;
+        z-index: 2;
+    }
+
+    .submit-story-header p {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1.2rem;
+        margin-bottom: 0;
+        position: relative;
+        z-index: 2;
+    }
+
+    .story-form-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 3rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .story-form-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+        background-size: 300% 100%;
+        animation: gradientShift 3s ease infinite;
+    }
+
+    @keyframes gradientShift {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    .form-section {
+        margin-bottom: 2.5rem;
+    }
+
+    .form-section-title {
+        color: white;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+    }
+
+    .form-section-title i {
+        color: #4ecdc4;
+        font-size: 1.3rem;
+    }
+
+    .form-group {
+        margin-bottom: 2rem;
+    }
+
+    .form-label {
+        color: white;
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-bottom: 0.8rem;
+        display: block;
+    }
+
+    .form-control {
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        padding: 1rem 1.2rem;
+        color: white;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+    }
+
+    .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .form-control:focus {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: #4ecdc4;
+        box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.2);
+        outline: none;
+        color: white;
+    }
+
+    .form-control:focus::placeholder {
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    textarea.form-control {
+        min-height: 200px;
+        resize: vertical;
+        line-height: 1.6;
+    }
+
+    .info-alert {
+        background: linear-gradient(135deg, rgba(78, 205, 196, 0.2), rgba(69, 183, 209, 0.2));
+        border: 1px solid rgba(78, 205, 196, 0.3);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        backdrop-filter: blur(10px);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .info-alert i {
+        color: #4ecdc4;
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+
+    .info-alert p {
+        color: rgba(255, 255, 255, 0.9);
+        margin: 0;
+        font-size: 1rem;
+        line-height: 1.5;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+        border: none;
+        padding: 1rem 2.5rem;
+        border-radius: 50px;
+        color: white;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(255, 107, 107, 0.6);
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-cancel {
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        padding: 1rem 2.5rem;
+        border-radius: 50px;
+        color: white;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-cancel:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateY(-3px);
+        color: white;
+        text-decoration: none;
+    }
+
+    .writing-tips {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        backdrop-filter: blur(10px);
+    }
+
+    .writing-tips h4 {
+        color: #4ecdc4;
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .writing-tips ul {
+        color: rgba(255, 255, 255, 0.8);
+        margin: 0;
+        padding-left: 1.5rem;
+    }
+
+    .writing-tips li {
+        margin-bottom: 0.5rem;
+        line-height: 1.5;
+    }
+
+    /* Floating decorative elements */
+    .floating-element {
+        position: absolute;
+        opacity: 0.1;
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .floating-element:nth-child(1) {
+        top: 10%;
+        left: 5%;
+        animation-delay: 0s;
+    }
+
+    .floating-element:nth-child(2) {
+        top: 20%;
+        right: 10%;
+        animation-delay: 2s;
+    }
+
+    .floating-element:nth-child(3) {
+        bottom: 30%;
+        left: 15%;
+        animation-delay: 4s;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(180deg); }
+    }
+
+    /* Character counter */
+    .char-counter {
+        text-align: right;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+        .submit-story-container {
+            padding: 0 1rem;
+        }
+
+        .submit-story-header h1 {
+            font-size: 2.5rem;
+        }
+
+        .submit-story-header p {
+            font-size: 1rem;
+        }
+
+        .story-form-card {
+            padding: 2rem;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .btn-submit,
+        .btn-cancel {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="submit-story-wrapper">
+    <!-- Floating decorative elements -->
+    <div class="floating-element">
+        <i class="fas fa-pen-fancy" style="font-size: 2rem; color: #ffd700;"></i>
+    </div>
+    <div class="floating-element">
+        <i class="fas fa-lightbulb" style="font-size: 1.5rem; color: #ff6b6b;"></i>
+    </div>
+    <div class="floating-element">
+        <i class="fas fa-star" style="font-size: 2.5rem; color: #4ecdc4;"></i>
+    </div>
+
+    <div class="submit-story-container">
+        <div class="submit-story-header">
+            <h1><i class="fas fa-pen-fancy"></i> Share Your Success Story</h1>
+            <p>Inspire others with your journey, achievements, and experiences</p>
+                </div>
+
+        <div class="story-form-card">
+                    <form method="POST">
+                <div class="form-section">
+                    <h3 class="form-section-title">
+                        <i class="fas fa-heading"></i>
+                        Story Details
+                    </h3>
+                    
+                    <div class="form-group">
+                            <label for="title" class="form-label">Story Title</label>
+                        <input type="text" class="form-control" id="title" name="title" 
+                               placeholder="Enter a compelling title for your story..." required>
+                        </div>
+
+                    <div class="form-group">
+                            <label for="content" class="form-label">Your Story</label>
+                        <textarea class="form-control" id="content" name="content" 
+                                  placeholder="Share your journey, achievements, challenges overcome, and the lessons learned. Be authentic and inspiring..." 
+                                  required></textarea>
+                        <div class="char-counter">
+                            <span id="charCount">0</span> characters
+                        </div>
+                    </div>
+                </div>
+
+                <div class="writing-tips">
+                    <h4><i class="fas fa-lightbulb"></i> Writing Tips</h4>
+                    <ul>
+                        <li>Start with a compelling hook that grabs attention</li>
+                        <li>Share specific challenges and how you overcame them</li>
+                        <li>Include concrete achievements and milestones</li>
+                        <li>End with lessons learned or advice for others</li>
+                        <li>Keep it authentic and personal</li>
+                    </ul>
+                </div>
+
+                <div class="info-alert">
+                            <i class="fas fa-info-circle"></i> 
+                    <p>Your story will be reviewed by administrators before being published to ensure quality and appropriateness for our community.</p>
+                        </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-paper-plane"></i>
+                        Submit Story
+                    </button>
+                    <a href="{{ url_for('stories') }}" class="btn-cancel">
+                        <i class="fas fa-times"></i>
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Character counter for textarea
+    document.getElementById('content').addEventListener('input', function() {
+        const charCount = this.value.length;
+        document.getElementById('charCount').textContent = charCount;
+    });
+</script>
+{% endblock %}

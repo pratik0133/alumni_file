@@ -1,0 +1,356 @@
+{% extends "base.html" %}
+
+{% block title %}Pending Users - Admin{% endblock %}
+
+{% block content %}
+<!-- Modern Admin Pending Users Design Styles and Features -->
+<style>
+body {
+    background: linear-gradient(120deg, rgba(40,40,60,0.92) 0%, rgba(60,60,80,0.92) 100%),
+                url('https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=2000&q=80') center center/cover no-repeat fixed !important;
+    min-height: 100vh;
+    position: relative;
+}
+.sidebar, .card, .modal-content {
+    background: rgba(44, 62, 80, 0.55) !important;
+    border-radius: 22px !important;
+    box-shadow: 0 8px 32px 0 rgba(31,38,135,0.22) !important;
+    backdrop-filter: blur(18px) !important;
+    -webkit-backdrop-filter: blur(18px) !important;
+    border: 1.5px solid rgba(255,255,255,0.18) !important;
+    color: #f8fafd !important;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.18);
+}
+.sidebar .nav-link {
+    color: #f8fafd !important;
+    font-weight: 500;
+    border-radius: 12px;
+    transition: background 0.2s, color 0.2s;
+}
+.sidebar .nav-link.active, .sidebar .nav-link:hover {
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%) !important;
+    color: #fff !important;
+    box-shadow: 0 2px 8px rgba(102,126,234,0.18) !important;
+}
+.card-header, .modal-header {
+    background: transparent !important;
+    border-bottom: 1px solid rgba(255,255,255,0.12) !important;
+}
+.card-body, .modal-body {
+    background: transparent !important;
+}
+.badge {
+    font-size: 0.95em;
+    border-radius: 8px;
+    padding: 0.4em 0.8em;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(102,126,234,0.10);
+}
+.btn-primary, .btn-info, .btn-success, .btn-warning, .btn-secondary, .btn-danger {
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+    box-shadow: 0 2px 8px rgba(102,126,234,0.10) !important;
+    transition: transform 0.2s, box-shadow 0.2s !important;
+}
+.btn-primary:hover, .btn-info:hover, .btn-success:hover, .btn-warning:hover, .btn-secondary:hover, .btn-danger:hover {
+    transform: translateY(-2px) scale(1.04) !important;
+    box-shadow: 0 6px 18px rgba(102,126,234,0.18) !important;
+}
+.h2, h1, h5, .modal-title {
+    color: #fff !important;
+    text-shadow: 0 4px 24px rgba(0,0,0,0.25);
+}
+.text-muted, .table .text-muted {
+    color: #b0b8c1 !important;
+}
+input.form-control, textarea.form-control, select.form-control {
+    background: rgba(255,255,255,0.12) !important;
+    color: #fff !important;
+    border-radius: 10px !important;
+    border: 1.5px solid rgba(255,255,255,0.18) !important;
+}
+input.form-control:focus, textarea.form-control:focus, select.form-control:focus {
+    background: rgba(255,255,255,0.18) !important;
+    color: #fff !important;
+    border-color: #667eea !important;
+    box-shadow: 0 0 0 2px #667eea44 !important;
+}
+::-webkit-input-placeholder { color: #e0e0e0 !important; }
+::-moz-placeholder { color: #e0e0e0 !important; }
+:-ms-input-placeholder { color: #e0e0e0 !important; }
+::placeholder { color: #e0e0e0 !important; }
+@media (max-width: 991px) {
+    .sidebar { margin-bottom: 2rem; }
+}
+@media (max-width: 767px) {
+    .h2, h1 { font-size: 1.5rem !important; }
+    .sidebar { padding: 1rem !important; }
+    .card, .modal-content { padding: 0.5rem !important; }
+}
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Admin Sidebar -->
+        <nav class="col-md-3 col-lg-2 d-md-block sidebar">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
+                            <i class="fas fa-dashboard"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('pending_users') }}">
+                            <i class="fas fa-user-clock"></i> Pending Users
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('manage_events') }}">
+                            <i class="fas fa-calendar"></i> Manage Events
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('manage_stories') }}">
+                            <i class="fas fa-pen"></i> Manage Stories
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Pending User Approvals</h1>
+                <div class="badge bg-warning fs-6">{{ users|length }} pending</div>
+            </div>
+
+            <!-- Search/Filter Bar -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text" id="search-addon">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" class="form-control" id="userSearch" onkeyup="filterUsers()" placeholder="Search users..." aria-label="Search users" aria-describedby="search-addon">
+                    </div>
+                </div>
+                <div class="col-md-6 text-end">
+                    <button class="btn btn-success" onclick="approveAll()">
+                        <i class="fas fa-check-double"></i> Approve All Pending Users
+                    </button>
+                </div>
+            </div>
+
+            {% if users %}
+                <div class="row">
+                    {% for user in users %}
+                    <div class="col-lg-6 mb-4">
+                        <div class="card pending-user-card" data-name="{{ user.first_name }} {{ user.last_name }}" data-email="{{ user.email }}">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">{{ user.first_name }} {{ user.last_name }}</h5>
+                                <span class="badge bg-warning">Pending</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <p class="card-text">
+                                            <strong>Email:</strong><br>
+                                            <span class="text-muted">{{ user.email }}</span>
+                                        </p>
+                                        <p class="card-text">
+                                            <strong>Graduation Year:</strong><br>
+                                            <span class="text-muted">{{ user.graduation_year or 'Not provided' }}</span>
+                                        </p>
+                                        <p class="card-text">
+                                            <strong>Degree:</strong><br>
+                                            <span class="text-muted">{{ user.degree or 'Not provided' }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <p class="card-text">
+                                            <strong>Department:</strong><br>
+                                            <span class="text-muted">{{ user.department or 'Not provided' }}</span>
+                                        </p>
+                                        <p class="card-text">
+                                            <strong>Registration Date:</strong><br>
+                                            <span class="text-muted">{{ user.created_at.strftime('%B %d, %Y') }}</span>
+                                        </p>
+                                        <p class="card-text">
+                                            <strong>Days Pending:</strong><br>
+                                            <span class="text-muted">{{ (moment().utc() - user.created_at).days if moment else 'N/A' }} days</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer d-flex justify-content-between">
+                                <a href="{{ url_for('approve_user', user_id=user.id) }}" 
+                                   class="btn btn-success btn-sm"
+                                   onclick="return confirm('Are you sure you want to approve this user?')"
+                                   title="Approve this user">
+                                    <i class="fas fa-check"></i> Approve
+                                </a>
+                                <button class="btn btn-danger btn-sm"
+                                        onclick="rejectUser({{ user.id }})"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#rejectModal{{ user.id }}"
+                                        title="Reject this user">
+                                    <i class="fas fa-times"></i> Reject
+                                </button>
+                                <button class="btn btn-info btn-sm"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#detailsModal{{ user.id }}"
+                                        title="View user details">
+                                    <i class="fas fa-eye"></i> View Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- User Details Modal -->
+                    <div class="modal fade" id="detailsModal{{ user.id }}" tabindex="-1">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">User Details - {{ user.first_name }} {{ user.last_name }}</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6>Personal Information</h6>
+                                            <p><strong>Full Name:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+                                            <p><strong>Email:</strong> {{ user.email }}</p>
+                                            <p><strong>Phone:</strong> {{ user.phone or 'Not provided' }}</p>
+                                            <p><strong>LinkedIn:</strong> 
+                                                {% if user.linkedin %}
+                                                    <a href="{{ user.linkedin }}" target="_blank">{{ user.linkedin }}</a>
+                                                {% else %}
+                                                    Not provided
+                                                {% endif %}
+                                            </p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6>Academic Information</h6>
+                                            <p><strong>Graduation Year:</strong> {{ user.graduation_year or 'Not provided' }}</p>
+                                            <p><strong>Degree:</strong> {{ user.degree or 'Not provided' }}</p>
+                                            <p><strong>Department:</strong> {{ user.department or 'Not provided' }}</p>
+                                            <p><strong>Registration Date:</strong> {{ user.created_at.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                                        </div>
+                                    </div>
+                                    {% if user.bio %}
+                                    <div class="mt-3">
+                                        <h6>Bio</h6>
+                                        <p>{{ user.bio }}</p>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <a href="{{ url_for('approve_user', user_id=user.id) }}" 
+                                       class="btn btn-success"
+                                       onclick="return confirm('Are you sure you want to approve this user?')">
+                                        <i class="fas fa-check"></i> Approve User
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reject Modal -->
+                    <div class="modal fade" id="rejectModal{{ user.id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Reject User Registration</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Are you sure you want to reject the registration for <strong>{{ user.first_name }} {{ user.last_name }}</strong>?</p>
+                                    <div class="mb-3">
+                                        <label for="rejectionReason{{ user.id }}" class="form-label">Reason for rejection (optional):</label>
+                                        <textarea class="form-control" id="rejectionReason{{ user.id }}" rows="3" 
+                                                  placeholder="Enter reason for rejection..."></textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="button" class="btn btn-danger" onclick="confirmReject({{ user.id }})">
+                                        <i class="fas fa-times"></i> Reject User
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Bulk Actions -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5>Bulk Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <button class="btn btn-success" onclick="approveAll()">
+                                    <i class="fas fa-check-double"></i> Approve All Pending Users
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="text-muted">
+                                    <small>Use bulk actions carefully. This action cannot be undone.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                    <h4>All caught up!</h4>
+                    <p class="text-muted">No pending user registrations at the moment.</p>
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-primary">Back to Dashboard</a>
+                </div>
+            {% endif %}
+        </main>
+    </div>
+</div>
+
+<script>
+// Simple client-side filter for user cards
+function filterUsers() {
+    var input = document.getElementById('userSearch');
+    var filter = input.value.toLowerCase();
+    var cards = document.querySelectorAll('.pending-user-card');
+    cards.forEach(function(card) {
+        var name = card.getAttribute('data-name').toLowerCase();
+        var email = card.getAttribute('data-email').toLowerCase();
+        if (name.includes(filter) || email.includes(filter)) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+function confirmReject(userId) {
+    const reason = document.getElementById('rejectionReason' + userId).value;
+    if (confirm('Are you sure you want to reject this user?')) {
+        // In a real implementation, you would send this to a reject endpoint
+        alert('User rejection functionality would be implemented here with reason: ' + reason);
+        // You would typically make an AJAX call to reject the user
+        // fetch('/admin/reject-user/' + userId, { method: 'POST', body: JSON.stringify({reason: reason}) })
+    }
+}
+
+function approveAll() {
+    if (confirm('Are you sure you want to approve ALL pending users? This action cannot be undone.')) {
+        // In a real implementation, you would send this to a bulk approve endpoint
+        alert('Bulk approval functionality would be implemented here');
+        // fetch('/admin/approve-all-users', { method: 'POST' })
+    }
+}
+</script>
+{% endblock %}

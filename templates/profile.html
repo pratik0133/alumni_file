@@ -1,0 +1,609 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - Alumni Connect{% endblock %}
+
+{% block content %}
+<style>
+    .profile-container {
+        min-height: 100vh;
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.5) 100%),
+                    url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=2000&q=80') center/cover no-repeat;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 0;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .profile-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('https://images.unsplash.com/photo-1557804506-669a67965ba0?w=2000&q=80') center/cover no-repeat;
+        opacity: 0.1;
+        animation: backgroundShift 20s ease-in-out infinite;
+    }
+    
+    @keyframes backgroundShift {
+        0%, 100% { transform: scale(1) rotate(0deg); }
+        50% { transform: scale(1.1) rotate(1deg); }
+    }
+    
+    .profile-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 3rem 2.5rem;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        max-width: 800px;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .profile-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        transition: left 0.6s;
+    }
+    
+    .profile-card:hover::before {
+        left: 100%;
+    }
+    
+    .profile-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        position: relative;
+    }
+    
+    .profile-avatar-container {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .profile-avatar {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 3.5rem;
+        color: white;
+        font-weight: 700;
+        box-shadow: 0 15px 40px rgba(255, 107, 107, 0.4);
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .profile-avatar:hover {
+        transform: scale(1.05);
+        box-shadow: 0 20px 50px rgba(255, 107, 107, 0.5);
+    }
+    
+    .avatar-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+    
+    .avatar-initials {
+        font-size: 3.5rem;
+        font-weight: 700;
+        color: white;
+    }
+    
+    .avatar-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        border-radius: 50%;
+    }
+    
+    .profile-avatar:hover .avatar-overlay {
+        opacity: 1;
+    }
+    
+    .avatar-overlay i {
+        color: white;
+        font-size: 1.5rem;
+    }
+    
+    .profile-stats {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin-top: 1rem;
+    }
+    
+    .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .stat-item i {
+        color: #4ecdc4;
+        font-size: 1rem;
+    }
+    
+    .profile-title {
+        color: white;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .profile-subtitle {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 1.1rem;
+        font-weight: 300;
+    }
+    
+    .form-section {
+        margin-bottom: 2rem;
+    }
+    
+    .section-title {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+        position: relative;
+    }
+    
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 50px;
+        height: 2px;
+        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+    
+    .form-label {
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    
+    .form-control {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        padding: 1rem 1.2rem;
+        color: white;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+    }
+    
+    .form-control:focus {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: #4ecdc4;
+        box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.2);
+        color: white;
+        outline: none;
+    }
+    
+    .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.6);
+    }
+    
+    textarea.form-control {
+        resize: vertical;
+        min-height: 120px;
+    }
+    
+    .btn-update {
+        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+        border: none;
+        border-radius: 10px;
+        padding: 1rem 2.5rem;
+        color: white;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+    }
+    
+    .btn-update:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(255, 107, 107, 0.3);
+        color: white;
+    }
+    
+    .btn-update::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.6s;
+    }
+    
+    .btn-update:hover::before {
+        left: 100%;
+    }
+    
+    .floating-elements {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        overflow: hidden;
+    }
+    
+    .floating-element {
+        position: absolute;
+        opacity: 0.1;
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    .floating-element:nth-child(1) {
+        top: 15%;
+        left: 10%;
+        animation-delay: 0s;
+    }
+    
+    .floating-element:nth-child(2) {
+        top: 45%;
+        right: 15%;
+        animation-delay: 2s;
+    }
+    
+    .floating-element:nth-child(3) {
+        bottom: 25%;
+        left: 20%;
+        animation-delay: 4s;
+    }
+    
+    .floating-element:nth-child(4) {
+        top: 70%;
+        right: 25%;
+        animation-delay: 1s;
+    }
+    
+    .floating-element:nth-child(5) {
+        bottom: 15%;
+        right: 10%;
+        animation-delay: 3s;
+    }
+    
+    .floating-element:nth-child(6) {
+        top: 30%;
+        left: 5%;
+        animation-delay: 5s;
+    }
+    
+    /* Background Decorative Elements */
+    .bg-decoration {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        overflow: hidden;
+    }
+    
+    .decoration-circle {
+        position: absolute;
+        border-radius: 50%;
+        background: linear-gradient(45deg, rgba(255, 107, 107, 0.1), rgba(78, 205, 196, 0.1));
+        animation: pulse 4s ease-in-out infinite;
+    }
+    
+    .circle-1 {
+        width: 100px;
+        height: 100px;
+        top: 10%;
+        right: 10%;
+        animation-delay: 0s;
+    }
+    
+    .circle-2 {
+        width: 60px;
+        height: 60px;
+        bottom: 20%;
+        left: 5%;
+        animation-delay: 2s;
+    }
+    
+    .circle-3 {
+        width: 80px;
+        height: 80px;
+        top: 60%;
+        left: 15%;
+        animation-delay: 4s;
+    }
+    
+    .decoration-line {
+        position: absolute;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        animation: slide 6s ease-in-out infinite;
+    }
+    
+    .line-1 {
+        width: 200px;
+        height: 2px;
+        top: 25%;
+        right: 20%;
+        transform: rotate(45deg);
+        animation-delay: 1s;
+    }
+    
+    .line-2 {
+        width: 150px;
+        height: 2px;
+        bottom: 30%;
+        left: 10%;
+        transform: rotate(-30deg);
+        animation-delay: 3s;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 0.3; }
+        50% { transform: scale(1.2); opacity: 0.6; }
+    }
+    
+    @keyframes slide {
+        0%, 100% { transform: translateX(-100%) rotate(45deg); opacity: 0; }
+        50% { transform: translateX(100%) rotate(45deg); opacity: 1; }
+    }
+    
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0px) rotate(0deg);
+        }
+        50% {
+            transform: translateY(-20px) rotate(10deg);
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .profile-card {
+            margin: 1rem;
+            padding: 2rem 1.5rem;
+        }
+        
+        .profile-title {
+            font-size: 2rem;
+        }
+        
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            font-size: 3rem;
+        }
+        
+        .profile-stats {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .stat-item {
+            font-size: 0.8rem;
+            padding: 0.4rem 0.8rem;
+        }
+        
+        .floating-elements {
+            display: none;
+        }
+        
+        .bg-decoration {
+            display: none;
+        }
+    }
+</style>
+
+<div class="profile-container">
+    <div class="profile-card">
+        <div class="floating-elements">
+            <div class="floating-element">
+                <i class="fas fa-user-circle fa-2x" style="color: #4ecdc4;"></i>
+            </div>
+            <div class="floating-element">
+                <i class="fas fa-edit fa-2x" style="color: #ff6b6b;"></i>
+            </div>
+            <div class="floating-element">
+                <i class="fas fa-save fa-2x" style="color: #4ecdc4;"></i>
+            </div>
+            <div class="floating-element">
+                <i class="fas fa-briefcase fa-2x" style="color: #ff6b6b;"></i>
+            </div>
+            <div class="floating-element">
+                <i class="fas fa-graduation-cap fa-2x" style="color: #4ecdc4;"></i>
+            </div>
+            <div class="floating-element">
+                <i class="fas fa-network-wired fa-2x" style="color: #ff6b6b;"></i>
+            </div>
+        </div>
+        
+        <!-- Background Decorative Elements -->
+        <div class="bg-decoration">
+            <div class="decoration-circle circle-1"></div>
+            <div class="decoration-circle circle-2"></div>
+            <div class="decoration-circle circle-3"></div>
+            <div class="decoration-line line-1"></div>
+            <div class="decoration-line line-2"></div>
+        </div>
+        
+        <div class="profile-header">
+            <div class="profile-avatar-container">
+                <div class="profile-avatar">
+                    {% if current_user.profile_picture %}
+                        <img src="{{ current_user.profile_picture }}" alt="Profile Picture" class="avatar-image">
+                    {% else %}
+                        <div class="avatar-initials">
+                            {{ (current_user.first_name[0] if current_user.first_name else 'A') + (current_user.last_name[0] if current_user.last_name else 'U') }}
+                        </div>
+                    {% endif %}
+                    <div class="avatar-overlay">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                </div>
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <i class="fas fa-calendar-check"></i>
+                        <span>Member since {{ current_user.created_at.strftime('%Y') }}</span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>{{ current_user.graduation_year or 'N/A' }}</span>
+                    </div>
+                </div>
+            </div>
+            <h1 class="profile-title">My Profile</h1>
+            <p class="profile-subtitle">Update your professional information and stay connected</p>
+        </div>
+        
+                    <form method="POST">
+            <div class="form-section">
+                <h3 class="section-title">
+                    <i class="fas fa-user me-2"></i>Personal Information
+                </h3>
+                        <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="first_name" class="form-label">
+                                <i class="fas fa-user-circle me-1"></i>First Name
+                            </label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" 
+                                   value="{{ current_user.first_name or '' }}" placeholder="Enter your first name">
+                        </div>
+                            </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="last_name" class="form-label">
+                                <i class="fas fa-user-circle me-1"></i>Last Name
+                            </label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" 
+                                   value="{{ current_user.last_name or '' }}" placeholder="Enter your last name">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h3 class="section-title">
+                    <i class="fas fa-briefcase me-2"></i>Professional Information
+                </h3>
+                        <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="company" class="form-label">
+                                <i class="fas fa-building me-1"></i>Current Company
+                            </label>
+                                <input type="text" class="form-control" id="company" name="company" 
+                                   value="{{ current_user.company or '' }}" placeholder="Enter your company name">
+                        </div>
+                            </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="position" class="form-label">
+                                <i class="fas fa-id-badge me-1"></i>Position
+                            </label>
+                                <input type="text" class="form-control" id="position" name="position" 
+                                   value="{{ current_user.position or '' }}" placeholder="Enter your job title">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h3 class="section-title">
+                    <i class="fas fa-address-book me-2"></i>Contact Information
+                </h3>
+                        <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="phone" class="form-label">
+                                <i class="fas fa-phone me-1"></i>Phone Number
+                            </label>
+                                <input type="tel" class="form-control" id="phone" name="phone" 
+                                   value="{{ current_user.phone or '' }}" placeholder="Enter your phone number">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="linkedin" class="form-label">
+                                <i class="fab fa-linkedin me-1"></i>LinkedIn Profile
+                            </label>
+                            <input type="url" class="form-control" id="linkedin" name="linkedin" 
+                                   value="{{ current_user.linkedin or '' }}" placeholder="Enter your LinkedIn URL">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h3 class="section-title">
+                    <i class="fas fa-info-circle me-2"></i>About Me
+                </h3>
+                <div class="form-group">
+                    <label for="bio" class="form-label">
+                        <i class="fas fa-quote-left me-1"></i>Professional Bio
+                    </label>
+                    <textarea class="form-control" id="bio" name="bio" rows="4" 
+                              placeholder="Tell us about your professional journey, achievements, and interests...">{{ current_user.bio or '' }}</textarea>
+            </div>
+        </div>
+            
+            <button type="submit" class="btn btn-update">
+                <i class="fas fa-save me-2"></i>Update Profile
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
