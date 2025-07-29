@@ -12,7 +12,13 @@ app = Flask(__name__)
 
 # Production Configuration
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', secrets.token_hex(16))
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///alumni.db')
+
+# Handle Render's DATABASE_URL format
+database_url = os.environ.get('DATABASE_URL')
+if database_url and database_url.startswith('postgres://'):
+    database_url = database_url.replace('postgres://', 'postgresql://', 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url or 'sqlite:///alumni.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Security Headers
@@ -27,6 +33,10 @@ db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
+# Initialize database tables
+with app.app_context():
+    db.create_all()
 
 # Database Models
 class User(UserMixin, db.Model):
@@ -491,4 +501,6 @@ if __name__ == '__main__':
             db.session.add(admin)
             db.session.commit()
     
-    app.run(debug=True, port=1001)
+    # Only run in debug mode locally
+    if os.environ.get('FLASK_ENV') != 'production':
+        app.run(debug=True, port=1001)
